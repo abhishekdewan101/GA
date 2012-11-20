@@ -5,6 +5,6 @@ public class PMX {
 	
 	
 	public void performPMX(){
-		ArrayList <Integers> bestSolution = 
+		
 	}
 }
