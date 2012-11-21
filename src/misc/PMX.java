@@ -1,7 +1,10 @@
-package functions;
+package misc;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import functions.fitnessCalculation;
+import functions.nearestNeighbour;
 
 import main.CVRPData;
 
@@ -18,35 +21,47 @@ public class PMX {
 		int startPMX = randomGenerator(bestSolution.size());
 		int stopPMX = randomGenerator(bestSolution.size());
 		System.out.println(startPMX+"  "+stopPMX);
-	//	ArrayList<Integer> temp1 = bestSolution;
-		//ArrayList <Integer>temp2 = randomSolutionGenerator();
 		
 		for(int i = startPMX;i<=stopPMX;i++){
 		ArrayList<Integer> temp1 = bestSolution;
+		int child[] = new int[temp1.size()];
 		ArrayList <Integer>temp2 = new pointMutation().generatedRandomChormo();
-		int tempVal = (Integer) temp1.get(i);
-		temp1.set(i, temp2.get(i));
-		temp2.set(i,tempVal);
+		int valueToBeAdded;
+		int valueToBeSearched;
 		
-		if(fc1.calculateCost(temp1)<bestFitness){
-			bestFitness = fc1.calculateCost(temp1);
-			bestPathFound = fc1.pathFound;
-			printResults(bestFitness,bestPathFound);
-		}else if(fc1.calculateCost(temp2)<bestFitness){
-			bestFitness = fc1.calculateCost(temp2);
-			bestPathFound = fc1.pathFound;
-			printResults(bestFitness,bestPathFound);
-		}else if(fc1.calculateCost(temp2)<bestFitness && fc1.calculateCost(temp1)<bestFitness){
-				if(fc1.calculateCost(temp1)<fc1.calculateCost(temp2)){
-					bestFitness = fc1.calculateCost(temp1);
-					bestPathFound = fc1.pathFound;
-					printResults(bestFitness,bestPathFound);
-				}else{
-					bestFitness = fc1.calculateCost(temp2);
-					bestPathFound = fc1.pathFound;
-					printResults(bestFitness,bestPathFound);
-				}
+		for(int y=0;y<child.length;y++){
+			child[y]=-1;
 		}
+		
+		for(int y=startPMX;y<stopPMX;y++){
+			child[y]=temp1.get(y);
+		}
+		boolean inBetween;
+		boolean terminateWhile =true;
+		for(int y=startPMX;y<stopPMX;y++){
+			if(child[y]!=temp2.get(y)){
+				valueToBeAdded = temp2.get(y);
+				valueToBeSearched = temp1.get(y);
+				while(terminateWhile == true){
+				for(int z=0;z<temp2.size();z++){
+					inBetween =false;
+					if(temp2.get(z)==valueToBeSearched){
+						inBetween = inBetween(z,startPMX,stopPMX);
+					}	
+					if(inBetween==true){
+						valueToBeSearched = temp1.get(z);
+					}else{
+						
+					}
+				}
+				}
+				
+			}
+		}
+		 
+		
+		
+		
 			
 			
 		}
@@ -56,6 +71,14 @@ public class PMX {
 	
 	
 	
+	private void checkinBetween(int valueofParent1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
 	public int randomGenerator(int given){
 		Random r1 = new Random();
 		return r1.nextInt(given);
@@ -74,6 +97,19 @@ public class PMX {
 				System.out.print(bestPathFound.get(i)+"->");
 			}
 		}
+	}
+	
+	public boolean inBetween(int number,int from,int to){
+		boolean inBetween = false;
+		
+		for(int i=from;i<to;i++){
+			if(i==number){
+				inBetween = true;
+			}
+		}
+		
+		
+		return inBetween;
 	}
 	public ArrayList <Integer> randomSolutionGenerator(){
 		ArrayList tempList = new ArrayList();
