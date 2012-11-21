@@ -76,9 +76,12 @@ public class pointMutation {
 	public ArrayList<Integer> generatedRandomChormo(){
 		ArrayList <Integer> tempArray = new ArrayList();
 		
-		for(int i=2;i<=CVRPData.NUM_NODES;i++){
-			tempArray.add((int) (2+Math.floor((Math.random()*CVRPData.NUM_NODES-1))));
+		while(tempArray.size()<CVRPData.NUM_NODES){
+			int y = 1+(int)(Math.floor((Math.random()*CVRPData.NUM_NODES-1)));
+			if(!tempArray.contains(y)){
+			tempArray.add(y);
 		}
+			}
 		return tempArray;
 	}
 }
