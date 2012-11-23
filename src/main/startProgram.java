@@ -21,12 +21,9 @@ public class startProgram {
 		bestPathFound = fc1.getPathFound();
 		int count =0;
 		
-		ArrayList temp1 = o1.crossover(0.00001);
+		ArrayList temp1 = o1.crossover(0.01);
 		
-		for(int i=2;i<temp1.size();i++){
-			if(temp1.contains(i)==false){
-				System.out.println(i);
-			}
+		
 		
 		
 		if(fc1.calculateCost(temp1)<bestFitness){
@@ -35,7 +32,7 @@ public class startProgram {
 			}
 		//System.out.println(count);
 		count++;
-		}
+		
 		System.out.println(bestFitness);
 		for(int i=0;i<bestPathFound.size();i++){
 		if(i==0){

@@ -1,6 +1,7 @@
 package functions;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import main.CVRPData;
 
@@ -35,33 +36,37 @@ public class operators {
 		return tempArray;
 	}
 	
+	ArrayList <Integer> text = null;
+	nearestNeighbour nn1 = new nearestNeighbour();
+	fitnessCalculation fc1 = new fitnessCalculation();
+	double bestFitnessCost =fc1.calculateCost(nn1.calculateInitialPopulation());
+	ArrayList <Integer> tempArray2 =fc1.getPathFound();
+	ArrayList<ArrayList> chromosomes = getCrossoverChromo(tempArray2);
+	ArrayList <ArrayList> currentBest = chromosomes;
 	
 	public ArrayList<Integer> crossover(double rate){
-		ArrayList <Integer> text = null;
-		nearestNeighbour nn1 = new nearestNeighbour();
-		fitnessCalculation fc1 = new fitnessCalculation();
-		double bestFitnessCost =fc1.calculateCost(nn1.calculateInitialPopulation());
-		ArrayList <Integer> tempArray2 =fc1.getPathFound(); 
+	 
 		
-		ArrayList<ArrayList> chromosomes = getCrossoverChromo(tempArray2);
-		ArrayList <ArrayList> currentBest = new ArrayList();
+		
+		
 		double startPoint =110;
 		double finalPoint = 0.0001;
 		
 		while(startPoint>=finalPoint){
 		ArrayList <ArrayList> children = new ArrayList<ArrayList>();
-		
-		int firstPoint = generateRandomPoint(chromosomes.size());
-		int secondPoint =generateRandomPoint(chromosomes.size());
+		int[] crossoverParents = findFittestParents(chromosomes);
+		int firstPoint = crossoverParents[0];//generateRandomPoint(chromosomes.size());
+		int secondPoint =crossoverParents[1];//generateRandomPoint(chromosomes.size());
 		
 		
 		
 		if(firstPoint == secondPoint ){
 			secondPoint=firstPoint+1;
 		}
+		
 		int crossoverPoint;
 		if(chromosomes.get(firstPoint).size()<chromosomes.get(secondPoint).size()){
-			crossoverPoint = generateRandomPoint(chromosomes.get(firstPoint).size());
+			crossoverPoint =  generateRandomPoint(chromosomes.get(firstPoint).size());
 			if(crossoverPoint == chromosomes.get(firstPoint).size()){
 				crossoverPoint = crossoverPoint-1;
 			}
@@ -72,7 +77,7 @@ public class operators {
 			}
 		}
 		
-		children = doCrossover(chromosomes.get(firstPoint),chromosomes.get(secondPoint),crossoverPoint);
+		children = improveFitness(doCrossover(chromosomes.get(firstPoint),chromosomes.get(secondPoint),crossoverPoint));
 		
 		chromosomes.set(firstPoint, children.get(0));
 		chromosomes.set(secondPoint, children.get(1));
@@ -85,6 +90,7 @@ public class operators {
 			currentBest = chromosomes;
 			System.out.println(fc1.calculateCost(text));
 			ArrayList bestPathFound = fc1.getPathFound();
+			//chromosomes = getCrossoverChromo(tempArray2);
 			for(int i=0;i<bestPathFound.size();i++){
 				if(i==0){
 					System.out.print(bestPathFound.get(i)+"->");
@@ -97,8 +103,9 @@ public class operators {
 				}
 			}
 		}else{
+			System.out.println(fc1.calculateCost(text));
 			System.out.println("-x-x-x-x-x-x-x-x-x-x FINDING -x-x-x-x-x-x-x-x-x");
-			chromosomes = getCrossoverChromo(tempArray2);
+			chromosomes = currentBest;
 		}
 		
 
@@ -110,12 +117,57 @@ public class operators {
 		
 	}
 	
-	public ArrayList<ArrayList> doCrossover(ArrayList father,ArrayList mother,int crossPoint){
+	public ArrayList<ArrayList> improveFitness(ArrayList<ArrayList> children){
+		ArrayList <ArrayList> improvedChild = new ArrayList<ArrayList>();
+		int firstPlace=0;
+		int secondPlace=0;
+		for(int i=0;i<children.size();i++){
+			ArrayList<Integer>tempChild = children.get(i);
+			ArrayList <Double>distanceFromStart = new ArrayList();
+			
+			for(int y=0;y<tempChild.size();y++){
+				distanceFromStart.add(CVRPData.getDistance(tempChild.get(y),1));
+			}
+			int count = 0;
+			double min = Integer.MAX_VALUE;
+			for(int y=0;y<distanceFromStart.size();y++){
+				if(distanceFromStart.get(y)<min){
+					min = distanceFromStart.get(y);
+					firstPlace = tempChild.get(y);
+					count =y;
+				}
+			}
+			min = Integer.MAX_VALUE;
+			for(int y=0;y<distanceFromStart.size();y++){
+				if(y!=count){
+				if(distanceFromStart.get(y)<min){
+					min = distanceFromStart.get(y);
+					secondPlace = tempChild.get(y);
+					System.out.println();
+				}
+			}
+		}
+		}
+		return improvedChild;
+		
+	}
+	
+	public ArrayList<ArrayList> doCrossover(ArrayList<Integer> father,ArrayList<Integer> mother,int crossPoint){
 		ArrayList <ArrayList>tempArrayTo = new ArrayList();
 		ArrayList <Integer> tempArray = new ArrayList();
 		ArrayList <Integer> tempArray2 = new ArrayList();
+		double child1Cap=0;
+		double child2Cap=0;
 		
+		for(int i=0;i<crossPoint;i++){
+			child1Cap = child1Cap + CVRPData.getDemand(father.get(i));
+			child2Cap = child2Cap + CVRPData.getDemand(mother.get(i));
+		}
 		
+		double limitLeft1 = 220-(new fitnessCalculation().calculateCost(father));
+		double limitLeft2 = 220-(new fitnessCalculation().calculateCost(mother));
+		
+	if((child1Cap<=(child2Cap+limitLeft2))&&((child2Cap<=(child1Cap+limitLeft1)))){	
 		if(father.size()>mother.size()){
 			for(int i=0;i<father.size();i++){
 				if(i>=0 && i<crossPoint){
@@ -145,7 +197,10 @@ public class operators {
 				}
 			}
 		}
-			
+	}else{
+		tempArray = mother;
+		tempArray2 = father;
+	}
 		tempArrayTo.add(tempArray);
 		tempArrayTo.add(tempArray2);
 	return tempArrayTo;	
@@ -196,7 +251,45 @@ public class operators {
 		
 		return listToBePassed;
 	}
-
+	
+	
+	public int[] findFittestParents(ArrayList<ArrayList> parents){
+		int [] fittestParents = new int[2];
+		ArrayList<Double> parentsFitness = new ArrayList<Double>();
+		
+		for(int i=0;i<parents.size();i++){
+			parentsFitness.add(new fitnessCalculation().calculateCost(parents.get(i)));
+		}
+		
+		double min = Integer.MAX_VALUE;
+		
+		for(int i=0;i<parentsFitness.size();i++){
+			if(parentsFitness.get(i)<min){
+				min = parentsFitness.get(i);
+				fittestParents[0] = i;
+			}
+		}
+		
+//		double max1 = Integer.MIN_VALUE;
+//		for(int i=0;i<parentsFitness.size();i++){
+//		
+//			if(parentsFitness.get(i)>max1){
+//				max1 = parentsFitness.get(i);
+//				fittestParents[0] = i;
+//			
+//		}
+//	}		
+		double max = Integer.MIN_VALUE;
+		for(int i=0;i<parentsFitness.size();i++){
+			if(i!=fittestParents[0]){
+			if(parentsFitness.get(i)>max){
+				max = parentsFitness.get(i);
+				fittestParents[1] = i;
+			}
+		}
+			}
+		return fittestParents;
+	}
 
 	public ArrayList<Integer> generatedRandomChormo(){
 		ArrayList <Integer> tempArray = new ArrayList();
@@ -216,6 +309,9 @@ public class operators {
 	}
 	
 	public int generateRandomPoint(int limit){
-		return 0+(int)Math.floor(Math.random()*(limit-1));
+		Random r1 = new Random();
+		return r1.nextInt(limit);
 	}
+	
+	
 }
