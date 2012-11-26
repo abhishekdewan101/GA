@@ -4,9 +4,9 @@ package functions;
 import java.util.ArrayList;
 import main.CVRPData;
 public class nearestNeighbour{
-	
+	ArrayList <Integer> pathFollowed = new ArrayList();
 	public ArrayList<Integer> calculateInitialPopulation(){
-		ArrayList <Integer> pathFollowed = new ArrayList();
+		
 		int currentNode = 1;
 		int nodeWithMinDistance = 1;
 		while(pathFollowed.size()<=(CVRPData.NUM_NODES-1)){
@@ -24,7 +24,15 @@ public class nearestNeighbour{
 		
 		
 	}
-
+	public int[] getPathInArray(){
+		int[] path = new int[pathFollowed.size()];
+		
+		for(int i=0;i<path.length;i++){
+			path[i] = pathFollowed.get(i);
+		}
+		
+		return path;
+	}
 	private  int getNodeWithMinDist(double[] distancesArray,	ArrayList<Integer> pathFollowed) {
 		int tempNode = 1;
 		double tempCount = Integer.MAX_VALUE;

@@ -46,9 +46,6 @@ public class operators {
 	
 	public ArrayList<Integer> crossover(double rate){
 	 
-		
-		
-		
 		double startPoint =110;
 		double finalPoint = 0.0001;
 		
@@ -85,9 +82,9 @@ public class operators {
 		
 		text = combineChildren(chromosomes);
 		
-		if(fc1.calculateCost(text)<=bestFitnessCost){
+		if(fc1.calculateCost(text)<=bestFitnessCost||fc1.calculateCost(text)>bestFitnessCost){
 			bestFitnessCost =fc1.calculateCost(text);
-			currentBest = chromosomes;
+			
 			System.out.println(fc1.calculateCost(text));
 			ArrayList bestPathFound = fc1.getPathFound();
 			//chromosomes = getCrossoverChromo(tempArray2);
@@ -119,37 +116,118 @@ public class operators {
 	
 	public ArrayList<ArrayList> improveFitness(ArrayList<ArrayList> children){
 		ArrayList <ArrayList> improvedChild = new ArrayList<ArrayList>();
-		int firstPlace=0;
-		int secondPlace=0;
+		
 		for(int i=0;i<children.size();i++){
-			ArrayList<Integer>tempChild = children.get(i);
-			ArrayList <Double>distanceFromStart = new ArrayList();
+			ArrayList <Integer> tempChild = children.get(i);
+			int [] improvedVersion = new int[tempChild.size()];
+			int firstPlaceNumber = getMinDistanceNode(tempChild,1,false,0);
+			int secondPlaceNumber = getMinDistanceNode(tempChild,1,true,firstPlaceNumber);
 			
-			for(int y=0;y<tempChild.size();y++){
-				distanceFromStart.add(CVRPData.getDistance(tempChild.get(y),1));
-			}
-			int count = 0;
-			double min = Integer.MAX_VALUE;
-			for(int y=0;y<distanceFromStart.size();y++){
-				if(distanceFromStart.get(y)<min){
-					min = distanceFromStart.get(y);
-					firstPlace = tempChild.get(y);
-					count =y;
+			improvedVersion[0] = firstPlaceNumber;
+			improvedVersion[improvedVersion.length-1] = secondPlaceNumber;
+			
+			for(int y=0;y<improvedVersion.length;y++){
+				if(y==0||y==improvedVersion.length-1){
+				}else{
+					improvedVersion[y] = getMinDistanceNode(tempChild,1,firstPlaceNumber,secondPlaceNumber,improvedVersion);
 				}
 			}
-			min = Integer.MAX_VALUE;
-			for(int y=0;y<distanceFromStart.size();y++){
-				if(y!=count){
-				if(distanceFromStart.get(y)<min){
-					min = distanceFromStart.get(y);
-					secondPlace = tempChild.get(y);
-					System.out.println();
-				}
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			for(int y=0;y<improvedVersion.length;y++){
+				temp.add(improvedVersion[y]);
 			}
+			
+			improvedChild.add(temp);
 		}
-		}
+		
+		
+		
+		
 		return improvedChild;
 		
+	}
+	
+	
+	public int getMinDistanceNode(ArrayList<Integer>nodes,int fromNode,int flaggedNumber, int secondFlagNumber,int[]tempArray){
+		int tempNode = 1;
+		ArrayList <Double> distanceFromNode = new ArrayList();
+		
+		for(int i=0;i<nodes.size();i++){
+			distanceFromNode.add(CVRPData.getDistance(fromNode,nodes.get(i)));
+		}
+		
+		double minValue = Integer.MAX_VALUE;
+		for(int i=0;i<distanceFromNode.size();i++){
+			if(nodes.get(i)!=flaggedNumber){
+				if(nodes.get(i)!=secondFlagNumber){
+					if(doesItContain(tempArray,nodes.get(i))==false){
+						if(distanceFromNode.get(i)<minValue){
+								
+							minValue = distanceFromNode.get(i);
+							tempNode = nodes.get(i);
+							
+							}
+			
+						}
+				}
+			}
+		}
+		
+		return tempNode;
+	}
+	
+	
+	
+	public int getMinDistanceNode(ArrayList<Integer>nodes,int fromNode, boolean flag,int flaggedNumber){
+		if(flag == false){
+		int tempNode = 1;
+		ArrayList <Double> distanceFromNode = new ArrayList();
+		
+		for(int i=0;i<nodes.size();i++){
+			distanceFromNode.add(CVRPData.getDistance(fromNode,nodes.get(i)));
+		}
+		
+		double minValue = Integer.MAX_VALUE;
+		for(int i=0;i<distanceFromNode.size();i++){
+			if(distanceFromNode.get(i)<minValue){
+				minValue = distanceFromNode.get(i);
+				tempNode = nodes.get(i);
+			}
+		}
+		
+		return tempNode;
+		}else{
+			
+			int tempNode = 1;
+			ArrayList <Double> distanceFromNode = new ArrayList();
+			
+			for(int i=0;i<nodes.size();i++){
+				distanceFromNode.add(CVRPData.getDistance(fromNode,nodes.get(i)));
+			}
+			
+			double minValue = Integer.MAX_VALUE;
+			for(int i=0;i<distanceFromNode.size();i++){
+				if(nodes.get(i)!=flaggedNumber){
+				if(distanceFromNode.get(i)<minValue){
+					minValue = distanceFromNode.get(i);
+					tempNode = nodes.get(i);
+				}
+				}
+			
+			
+			
+			}
+			return tempNode;
+		}
+	}
+	public boolean doesItContain(int[]givenArray,int num){
+		boolean flag = false;
+		for(int i=0;i<givenArray.length;i++){
+			if(givenArray[i]==num){
+				flag = true;
+			}
+		}
+		return flag;
 	}
 	
 	public ArrayList<ArrayList> doCrossover(ArrayList<Integer> father,ArrayList<Integer> mother,int crossPoint){
@@ -219,7 +297,7 @@ public class operators {
 		
 		for(int i=2;i<tempArray.size();i++){
 			if(tempArray.contains(i)==false){
-				System.out.println(i);
+				System.out.println("sdas"+i);
 			}
 		}
 		return tempArray;

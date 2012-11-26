@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import functions.fitnessCalculation;
 import functions.nearestNeighbour;
 import functions.operators;
+import functions.operators2;
 
 import misc.PMX;
 
@@ -15,23 +16,24 @@ public class startProgram {
 	
 		fitnessCalculation fc1 = new fitnessCalculation();
 		nearestNeighbour nn1 = new nearestNeighbour();
-		operators o1 = new operators();
+		operators2 o1 = new operators2();
+		operators o2 = new operators();
 		ArrayList <Integer> bestPathFound = new ArrayList();
 		double bestFitness = fc1.calculateCost(nn1.calculateInitialPopulation());
 		bestPathFound = fc1.getPathFound();
-		int count =0;
+	
 		
-		ArrayList temp1 = o1.crossover(0.01);
+	//	o1.doOperation();
+//		o2.crossover(0.99);
+//		
 		
 		
-		
-		
-		if(fc1.calculateCost(temp1)<bestFitness){
-		bestFitness = fc1.calculateCost(temp1);
-		bestPathFound = fc1.getPathFound();
-			}
+//		if(fc1.calculateCost(temp1)<bestFitness){
+//		bestFitness = fc1.calculateCost(temp1);
+//		bestPathFound = fc1.getPathFound();
+//			}
 		//System.out.println(count);
-		count++;
+		
 		
 		System.out.println(bestFitness);
 		for(int i=0;i<bestPathFound.size();i++){

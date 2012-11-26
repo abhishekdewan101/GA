@@ -45,8 +45,27 @@ public class fitnessCalculation {
 		}
 		return fitnessCost;
 	}
-
+	
+	public double getFitnessWithArray(int[] paths){
+		double currentFitness =0.00;
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		for(int i=0;i<paths.length;i++){
+			temp.add(paths[i]);
+		}
+		currentFitness = calculateCost(temp);
+		return currentFitness;
+	}
+	
 	public ArrayList getPathFound() {
 		return pathFound;
+	}
+	
+	public int[] getPathFoundAsArray(){
+		int[] tempArray = new int[pathFound.size()];
+		
+		for(int i=0;i<tempArray.length;i++){
+			tempArray[i] = (Integer)pathFound.get(i);
+		}
+		return tempArray;
 	}
 }
